@@ -18,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.*;
 import java.sql.Date;
@@ -28,11 +29,13 @@ import java.text.SimpleDateFormat;
 
 
 /*
+ * ####################################################################
  * StartPage class
  * Extends the javafx.Application class
  *
  * This class creates the JavaFX GUI application for the 
  * PVGC Parts Catalog
+ * ####################################################################
  */
 public class StartPage extends Application {
 	
@@ -158,11 +161,12 @@ public class StartPage extends Application {
 
 
 /*
+ * ####################################################################
  * Part class
  *
  * The Part() object stores the properties of a given part entry
  * and the methods enable creation and manipulation of the data
- *
+ * ####################################################################
  */
 class Part {
 
@@ -303,7 +307,10 @@ class Part {
 		
 		// Add message prompting user to add part
 		Text addMsg = new Text("Add a New Part");
-		StartPage.partsGrid.add(addMsg, 0, 0);
+		addMsg.setFill(Color.GREEN);
+		addMsg.setFont(Font.font("serif", FontWeight.BOLD, 20));
+		addMsg.setTextAlignment(TextAlignment.CENTER);
+		StartPage.partsGrid.add(addMsg, 0, 0, 2, 1);
 		
 		// Create labels and TextFields for the new part properties
 		Label newPartNoLabel = new Label("Part #: ");
@@ -499,11 +506,12 @@ class Part {
 
 
 /*
+ * ####################################################################
  * Database class
  * 
  * The Database class stores the information and methods needed to
  * connect to and interact with the database.
- *  
+ *  ###################################################################
  */
 class Database extends StartPage {
 	
@@ -787,7 +795,9 @@ class Database extends StartPage {
 			updateInStock.setPromptText("New Qty (integer)");
 			updateInStock.setPrefColumnCount(4);
 			partsGrid.add(currentLabel, 0, 1);
-			Label updatedLabel = new Label("Last updated");
+			Text updatedLabel = new Text("Last updated");
+			updatedLabel.setFill(Color.GREEN);
+			updatedLabel.setFont(Font.font("serif", FontWeight.BOLD, 16));
 			partsGrid.add(updatedLabel, 6, 0);
 			Label updatedInfo = new Label(updatedString);
 			partsGrid.add(updatedInfo, 6, 1);
@@ -1200,34 +1210,78 @@ class Database extends StartPage {
 		Statement stmt = null;
 		
 		// Write SQL UPDATE string
-		String sqlInsert = "UPDATE parts SET partNo = \"" + newPartNo + "\", description = \"" + 
-				   description + "\", " + "make = \"" + make + "\", location = \"" + location + 
-				   "\", inStock = " + inStock + ", updated = " + 
-				   "CURRENT_TIMESTAMP WHERE partNo = \"" + partNo + "\";";
+		String sqlUpdate = "UPDATE parts SET partNo = \"" + newPartNo + 
+				"\", description = \"" + description + "\", " + 
+				"make = \"" + make + "\", location = \"" + location + 
+				"\", inStock = " + inStock + ", updated = " + 
+				"CURRENT_TIMESTAMP WHERE partNo = \"" + partNo + "\";";
 		
+		// Try to query the db and update part entry
 		try {
+			
+			// Create connection statement
 			stmt = dbconn.createStatement();
-			stmt.execute(sqlInsert);
+			
+			// Execute statement to update entry
+			stmt.execute(sqlUpdate);
+			
+			// Print message to console if successful
 			System.out.println("Changes saved successfully");
 			
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
+			// Print message to console if SQL error
 			System.out.println("Database error: Changes not saved");
 		}
 	}
 }
 
+
+/*
+ * ####################################################################
+ * ClearPartsGrid class
+ * 
+ * The ClearPartsGrid class clears all existing elements from the
+ * partsGrid region (the scrollable pane of the window), and 
+ * repopulates the header labels at the top.
+ * ####################################################################
+ */
 class ClearPartsGrid extends StartPage {
+	
+	/******************************************************************
+	 * 
+	 * ClearPartsGrid.clearGrid() method
+	 * 
+	 * This method will clear all child elements from the 
+	 * StartPage.partsGrid pane and write the header labels for
+	 * displaying part entries.
+	 * 
+	 *****************************************************************/
 	public static void clearGrid() {
+		
+		// Clear all current child elements from the pane
 		partsGrid.getChildren().clear();
-		Label num = new Label("Part #");
+		
+		// Create header Labels and add to the top row of the pane
+		Text num = new Text("Part #");
+		num.setFill(Color.GREEN);
+		num.setFont(Font.font("serif", FontWeight.BOLD, 16));
 		partsGrid.add(num, 1, 0);
-		Label descr = new Label("Description");
+		Text descr = new Text("Description");
+		descr.setFill(Color.GREEN);
+		descr.setFont(Font.font("serif", FontWeight.BOLD, 16));
 		partsGrid.add(descr, 2, 0);
-		Label mke = new Label("Make");
+		Text mke = new Text("Make");
+		mke.setFill(Color.GREEN);
+		mke.setFont(Font.font("serif", FontWeight.BOLD, 16));
 		partsGrid.add(mke, 3, 0);
-		Label loc = new Label("Location");
+		Text loc = new Text("Location");
+		loc.setFill(Color.GREEN);
+		loc.setFont(Font.font("serif", FontWeight.BOLD, 16));
 		partsGrid.add(loc, 4, 0);
-		Label stock = new Label("In stock");
+		Text stock = new Text("In stock");
+		stock.setFill(Color.GREEN);
+		stock.setFont(Font.font("serif", FontWeight.BOLD, 16));
 		partsGrid.add(stock, 5, 0);
 	}
 }
