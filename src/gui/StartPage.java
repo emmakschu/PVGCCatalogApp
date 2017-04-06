@@ -1066,8 +1066,8 @@ class Database extends StartPage {
 		Statement stmt = null;
 		
 		// Write SQL SELECT string
-		String sqlSelect = "SELECT id,partNo,description,make,location,inStock FROM parts " +
-				   "WHERE location LIKE '%" + query + "%';";
+		String sqlSelect = "SELECT id,partNo,description,make,location," +
+				"inStock FROM parts WHERE location LIKE '%" + query + "%';";
 		
 		// Try to retrieve data from db and save to ResultSet
 		try {
@@ -1078,59 +1078,52 @@ class Database extends StartPage {
 			// Execute statement and save to ResultSet
 			ResultSet rs = stmt.executeQuery(sqlSelect);
 			
-			int i = 1;
+			// Clear the current Part ArrayList
+			Part.PARTS.clear();
+			
+			// While loop to create Part for row of ResultSet
 			while (rs.next()) {
+				
+				// Get info from the SQL ResultSet
 				int id = rs.getInt("id");
 				String partNo = rs.getString("partNo");
 				String description = rs.getString("description");
 				String make = rs.getString("make");
 				String location = rs.getString("location");
 				int inStock = rs.getInt("inStock");
-								
-				Part p = Part.createPart(id, partNo, description, make, location, inStock);
-				Text partNoText = new Text(p.getPartNo());
-				Text partDescText = new Text(p.getDescription());
-				Text makeText = new Text(p.getMake());
-				Text locationText = new Text(p.getLocation());
-				Text inStockText = new Text(Integer.toString(p.getInStock()));
 				
-				Button editButton = new Button("Edit");
-				
-				editButton.setOnAction(
-						e -> {
-							Part.editPartScreen(partNo);
-						}
-				);
-				
-				partsGrid.add(editButton, 0, i);
-				
-				partsGrid.add(partNoText, 1, i);
-				partsGrid.add(partDescText , 2, i);
-				partsGrid.add(makeText, 3, i);
-				partsGrid.add(locationText, 4, i);
-				partsGrid.add(inStockText, 5, i);
-				i++;
+				// Create a new Part object from data
+				Part.createPart(id, partNo, description, 
+								make, location, inStock);
 			}
-		} catch (Exception e) {
+			
+			// Call the Part method to print results to screen
+			Part.showAll();
+		} 
+		catch (Exception e) {
+			// Print error message if SELECT error
 			System.out.println("Database error");
-		} finally {
+		} 
+		// Finally close the database connection
+		finally {
 			try {
 				if (stmt != null) {
 					stmt.close();
 				}
-			} catch (Exception e) {
+			} 
+			catch (Exception e) {
 				System.out.println("Database error");
 			}
 		}
 	}
 	
-	/*********************************************************************
+	/******************************************************************
 	 *
 	 * Database.addPart() method
 	 *
-	 * This method will retrieve input from user to add a new part entry
-	 * to the database with a SQL INSERT statement. The PRIMARY KEY int
-	 * will be set automatically be AUTO_INCREMENT.
+	 * This method will retrieve input from user to add a new part 
+	 * entry to the database with a SQL INSERT statement. The PRIMARY 
+	 * KEY int will be set automatically be AUTO_INCREMENT.
 	 *
 	 * Requires arguments:
 	 *  Connection dbconn (the DB connection object),
@@ -1140,39 +1133,73 @@ class Database extends StartPage {
 	 *  String location (matching a SQL VARCHAR(32)),
 	 *  int inStock (matching a SQL INT(11))
 	 *
-	 ********************************************************************/
+	 *****************************************************************/
 	public static void addPart(Connection dbconn,
-								String partNo,
-								String description,
-								String make,
-								String location,
-								int inStock) {
+							   String partNo,
+							   String description,
+							   String make,
+							   String location,
+							   int inStock) {
+		
+		// Declare Statement object, initialize to null
 		Statement stmt = null;
 		
-		String sqlInsert = "INSERT INTO parts (partNo,description,make,location,inStock) VALUES(" +
-				"\"" + partNo + "\",\"" + description + "\",\"" + make + "\",\"" + location + 
+		// Write SQL insert string
+		String sqlInsert = "INSERT INTO parts (partNo,description,make," +
+				"location,inStock) VALUES(\"" + partNo + "\",\"" +
+				description + "\",\"" + make + "\",\"" + location + 
 				"\"," + inStock + ");";
 		
+		// Try to query the db and INSERT new part entry
 		try {
+			
+			// Create connection statement
 			stmt = dbconn.createStatement();
+			
+			// Execute statement to add entry
 			stmt.execute(sqlInsert);
 			
+			// Print message to console if successful
 			System.out.println("Entry added to database");
 			
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
+			// Print error message to console if SQL error
 			System.out.println("Database error");
 		}
 	}
 	
+	
+	/******************************************************************
+	 * 
+	 * Database.updatePart() method
+	 * 
+	 * This method will retrieve input from user to update entries for
+	 * an existing part in the database. Fields that are left blank
+	 * will default to keep the current entry, while those that are
+	 * filled will update the field in the database.
+	 * 
+	 * Requires arguments:
+	 *  Connection dbconn (the DB connection object),
+	 *  String partNo (matching a SQL VARCHAR(32)),
+	 *  String description (matching a SQL VARCHAR(64)),
+	 *  String make (matching a SQL VARCHAR(32)),
+	 *  String location (matching a SQL VARCHAR(32)),
+	 *  int inStock (matching a SQL INT(11))
+	 * 
+	 *****************************************************************/
 	public static void updatePart(Connection dbconn,
-									String partNo,
-									String newPartNo,
-									String description,
-									String make,
-									String location,
-									int inStock) {
+								  String partNo,
+								  String newPartNo,
+								  String description,
+								  String make,
+								  String location,
+								  int inStock) {
+		
+		// Declare Statement object, initialize to null
 		Statement stmt = null;
 		
+		// Write SQL UPDATE string
 		String sqlInsert = "UPDATE parts SET partNo = \"" + newPartNo + "\", description = \"" + 
 				   description + "\", " + "make = \"" + make + "\", location = \"" + location + 
 				   "\", inStock = " + inStock + ", updated = " + 
@@ -1208,102 +1235,21 @@ class ClearPartsGrid extends StartPage {
 class ClearWindow extends StartPage {
 	public static void clearWin() {
 		mainGrid.getChildren().clear();
-		
-		Text welcomeMsg = new Text("Welcome to the PVGC Maintenance Catalog App");
-		welcomeMsg.setId("testID");
-		mainGrid.add(welcomeMsg, 0, 0);
+				
+		Image pvgcLogo = new Image("pvgcLogo1.jpg");
+		ImageView logoView = new ImageView(pvgcLogo);
+		mainGrid.add(logoView, 0, 0, 1, 9);
 		
 		Button addNewPart = new Button("Add New Part");
-		mainGrid.add(addNewPart, 2, 0);
+		mainGrid.add(addNewPart, 1, 1);
 		addNewPart.setOnAction(
 				e -> {
 					Part.addPartScreen();
 				}
 		);
 		
-		Text searchByPart = new Text("Search by part number:");
-		TextField partSearchBox = new TextField();
-		mainGrid.add(searchByPart, 0, 2);
-		mainGrid.add(partSearchBox, 1, 2);
-		Button partNumGo = new Button("Find by Part #");
-		mainGrid.add(partNumGo, 2, 2);
-		partNumGo.setOnAction( 
-				e -> {
-					try {
-						String searchQuery = partSearchBox.getText();
-						Connection dbconn = Database.connectDB();
-						ClearPartsGrid.clearGrid();
-						System.out.println("Finding parts like " + searchQuery);
-						Database.searchPartsByNo(dbconn, searchQuery);
-					} catch (Exception ex) {
-						System.out.println("Database error");
-					}
-				}
-		);
-		
-		Text searchByMake = new Text("Search by machine make:");
-		TextField makeSearchBox = new TextField();
-		mainGrid.add(searchByMake, 0, 3);
-		mainGrid.add(makeSearchBox, 1, 3);
-		Button makeGo = new Button("Find by make");
-		mainGrid.add(makeGo, 2, 3);
-		makeGo.setOnAction(  
-				e -> {
-					try {
-						String searchQuery = makeSearchBox.getText();
-						Connection dbconn = Database.connectDB();
-						ClearPartsGrid.clearGrid();
-						System.out.println("Finding makes like " + searchQuery);
-						Database.searchByMake(dbconn, searchQuery);
-					} catch (Exception ex) {
-						System.out.println("Database error");
-					}
-				}
-		);
-		
-		Text searchByDescription = new Text("Search by part description:");
-		TextField descriptionSearchBox = new TextField();
-		mainGrid.add(searchByDescription, 0, 4);
-		mainGrid.add(descriptionSearchBox, 1, 4);
-		Button descriptionGo = new Button("Find by description");
-		mainGrid.add(descriptionGo, 2, 4);
-		descriptionGo.setOnAction(
-				e -> {
-					try {
-						String searchQuery = descriptionSearchBox.getText();
-						Connection dbconn = Database.connectDB();
-						ClearPartsGrid.clearGrid();
-						System.out.println("Finding parts like " + searchQuery);
-						Database.searchPartsByDescription(dbconn, searchQuery);
-					} catch (Exception ex) {
-						System.out.println("Database error");
-					}
-				}				
-		);
-		
-		Text searchByLocation = new Text("Search by location:");
-		TextField locationSearchBox = new TextField();
-		locationSearchBox.setPromptText("e.g. A-1");
-		mainGrid.add(searchByLocation, 0, 5);
-		mainGrid.add(locationSearchBox, 1, 5);
-		Button locationGo = new Button("Find by location");
-		mainGrid.add(locationGo, 2, 5);
-		locationGo.setOnAction(
-				e -> {
-					try {
-						String searchQuery = locationSearchBox.getText();
-						Connection dbconn = Database.connectDB();
-						ClearPartsGrid.clearGrid();
-						System.out.println("Finding parts located at " + searchQuery);
-						Database.searchPartsByLocation(dbconn, searchQuery);
-					} catch (Exception ex) {
-						System.out.println("Database error");
-					}
-				}
-		);
-		
 		Button viewAllButton = new Button("View all parts");
-		mainGrid.add(viewAllButton, 0, 1);
+		mainGrid.add(viewAllButton, 1, 2);
 		
 		viewAllButton.setOnAction(
 				e -> {
@@ -1311,11 +1257,98 @@ class ClearWindow extends StartPage {
 						Connection dbconn = Database.connectDB();
 						ClearPartsGrid.clearGrid();
 						Database.fetchParts(dbconn);
-					} catch (Exception ex) {
+					} 
+					catch (Exception ex) {
 						System.out.println("Database error");
 					}
 				}				
 		);
+		
+		TextField partSearchBox = new TextField();
+		partSearchBox.setPromptText("Part number");
+		mainGrid.add(partSearchBox, 1, 4);
+		Button partNumGo = new Button("Find by Part #");
+		mainGrid.add(partNumGo, 2, 4);
+		partNumGo.setOnAction( 
+				e -> {
+					try {
+						String searchQuery = partSearchBox.getText();
+						Connection dbconn = Database.connectDB();
+						ClearPartsGrid.clearGrid();
+						System.out.println("Finding parts like " + searchQuery);
+						partSearchBox.clear();
+						Database.searchPartsByNo(dbconn, searchQuery);
+					} 
+					catch (Exception ex) {
+						System.out.println("Database error");
+					}
+				}
+		);
+		
+		TextField makeSearchBox = new TextField();
+		makeSearchBox.setPromptText("Part make");
+		mainGrid.add(makeSearchBox, 1, 5);
+		Button makeGo = new Button("Find by make");
+		mainGrid.add(makeGo, 2, 5);
+		makeGo.setOnAction(  
+				e -> {
+					try {
+						String searchQuery = makeSearchBox.getText();
+						Connection dbconn = Database.connectDB();
+						ClearPartsGrid.clearGrid();
+						System.out.println("Finding makes like " + searchQuery);
+						makeSearchBox.clear();
+						Database.searchByMake(dbconn, searchQuery);
+					} 
+					catch (Exception ex) {
+						System.out.println("Database error");
+					}
+				}
+		);
+		
+		TextField descriptionSearchBox = new TextField();
+		descriptionSearchBox.setPromptText("Part description");
+		mainGrid.add(descriptionSearchBox, 1, 6);
+		Button descriptionGo = new Button("Find by description");
+		mainGrid.add(descriptionGo, 2, 6);
+		descriptionGo.setOnAction(
+				e -> {
+					try {
+						String searchQuery = descriptionSearchBox.getText();
+						Connection dbconn = Database.connectDB();
+						ClearPartsGrid.clearGrid();
+						System.out.println("Finding parts like " + searchQuery);
+						descriptionSearchBox.clear();
+						Database.searchPartsByDescription(dbconn, searchQuery);
+					} 
+					catch (Exception ex) {
+						System.out.println("Database error");
+					}
+				}				
+		);
+		
+		TextField locationSearchBox = new TextField();
+		locationSearchBox.setPromptText("Location, e.g. A-1");
+		mainGrid.add(locationSearchBox, 1, 7);
+		Button locationGo = new Button("Find by location");
+		mainGrid.add(locationGo, 2, 7);
+		locationGo.setOnAction(
+				e -> {
+					try {
+						String searchQuery = locationSearchBox.getText();
+						Connection dbconn = Database.connectDB();
+						ClearPartsGrid.clearGrid();
+						System.out.println("Finding parts located at " + searchQuery);
+						locationSearchBox.clear();
+						Database.searchPartsByLocation(dbconn, searchQuery);
+					} 
+					catch (Exception ex) {
+						System.out.println("Database error");
+					}
+				}
+		);
+		
+
 	}
 }
 
