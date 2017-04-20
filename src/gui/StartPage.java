@@ -122,7 +122,7 @@ public class StartPage extends Application {
 		// Begin creating scene and stage to show to screen
 		Scene scene = new Scene(mainWindow);
 		scene.getStylesheets().clear();
-		primaryStage.setTitle("PVGC Inventory App");
+		primaryStage.setTitle("PVGC Parts Database");
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}

@@ -22,7 +22,7 @@ import javafx.scene.text.Text;
  * 
  * The Database class stores the information and methods needed to
  * connect to and interact with the database.
- *  ###################################################################
+ * ####################################################################
  */
 class Database extends StartPage {
 	
@@ -30,6 +30,13 @@ class Database extends StartPage {
 	private static final String server = "jdbc:mysql://localhost/";
 	private static final String dbName = "pvgcCatalog";
 	private static final String dbUser = "javaApp";
+
+	/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 *                         WARNING
+	 *
+	 *    BE SURE TO UPDATE PASSWORD FOR THE DATABASE CONNECTION!
+	 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	 */
 	private static final String dbPasswd = "myPassword";
 	
 	
